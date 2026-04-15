@@ -18,13 +18,12 @@
 #include "simfs.h"
 
 // We use the ops array to match the file system command entered by the user.
-#define MAXOPS  7
+#define MAXOPS 7
 char *ops[MAXOPS] = {"initfs", "printfs", "createfile", "readfile",
                      "writefile", "deletefile", "info"};
 int find_command(char *);
 
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     int oc;       /* option character */
     char *cmd;    /* command to run on the file system */
@@ -33,14 +32,17 @@ main(int argc, char **argv)
     char *usage_string = "Usage: simfs -f file cmd arg1 arg2 ...\n";
 
     /* Get and check the number of arguments */
-    if(argc < 4) {
+    if (argc < 4)
+    {
         fputs(usage_string, stderr);
         exit(1);
     }
 
-    while((oc = getopt(argc, argv, "f:")) != -1) {
-        switch(oc) {
-        case 'f' :
+    while ((oc = getopt(argc, argv, "f:")) != -1)
+    {
+        switch (oc)
+        {
+        case 'f':
             fsname = optarg;
             break;
         default:
@@ -53,7 +55,8 @@ main(int argc, char **argv)
     cmd = argv[optind];
     optind++;
 
-    switch((find_command(cmd))) {
+    switch ((find_command(cmd)))
+    {
     case 0: /* initfs */
         initfs(fsname);
         break;
@@ -61,16 +64,54 @@ main(int argc, char **argv)
         printfs(fsname);
         break;
     case 2: /* createfile */
-        fprintf(stderr, "Error: createfile not yet implemented\n");
+        if (optind >= argc)
+        {
+            fprintf(stderr, "Error: createfile requires a filename\n");
+            exit(1);
+        }
+        if (create_file(fsname, argv[optind]) != 0)
+            exit(1);
+        exit(0);
         break;
     case 3: /* readfile */
-        fprintf(stderr, "Error: readfile not yet implemented\n");
+        if (optind + 2 >= argc)
+        {
+            fprintf(stderr, "Error: readfile requires name offset count\n");
+            exit(1);
+        }
+        {
+            char *name = argv[optind];
+            int offset = atoi(argv[optind + 1]);
+            int count = atoi(argv[optind + 2]);
+            if (read_file(fsname, name, offset, count) != 0)
+                exit(1);
+            exit(0);
+        }
         break;
     case 4: /* writefile */
-        fprintf(stderr, "Error: writefile not yet implemented\n");
+        if (optind + 2 >= argc)
+        {
+            fprintf(stderr, "Error: writefile requires name offset count\n");
+            exit(1);
+        }
+        {
+            char *name = argv[optind];
+            int offset = atoi(argv[optind + 1]);
+            int count = atoi(argv[optind + 2]);
+            if (write_file(fsname, name, offset, count) != 0)
+                exit(1);
+            exit(0);
+        }
         break;
     case 5: /* deletefile */
-        fprintf(stderr, "Error: deletefile not yet implemented\n");
+        if (optind >= argc)
+        {
+            fprintf(stderr, "Error: deletefile requires a filename\n");
+            exit(1);
+        }
+        if (delete_file(fsname, argv[optind]) != 0)
+            exit(1);
+        exit(0);
         break;
     default:
         fprintf(stderr, "Error: Invalid command\n");
@@ -83,12 +124,13 @@ main(int argc, char **argv)
 /* Returns an integer corresponding to the file system command that
  * is going to be executed
  */
-int
-find_command(char *cmd)
+int find_command(char *cmd)
 {
     int i;
-    for(i = 0; i < MAXOPS; i++) {
-        if ((strncmp(cmd, ops[i], strlen(ops[i]))) == 0) {
+    for (i = 0; i < MAXOPS; i++)
+    {
+        if ((strncmp(cmd, ops[i], strlen(ops[i]))) == 0)
+        {
             return i;
         }
     }
