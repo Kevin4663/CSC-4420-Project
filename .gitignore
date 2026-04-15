@@ -5,6 +5,7 @@
 
 # generated images/data
 *.img
+simfs
 
 # temp files
 *.tmp
@@ -14,4 +15,6 @@
 *.md
 !README.md
 
-simfs
+# ignore starter code
+/starter_code/*
+
