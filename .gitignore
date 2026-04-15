@@ -1,0 +1,15 @@
+# build artifacts
+*.o
+*.out
+*.exe
+
+# generated images/data
+*.img
+
+# temp files
+*.tmp
+*.log
+
+# ignore all markdown except README
+*.md
+!README.md
